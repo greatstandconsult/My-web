@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portal Login | Great Stand Educational Consult</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; }
+    </style>
+</head>
+<body class="bg-slate-900 text-slate-100 flex flex-col min-h-screen justify-center px-4 py-8">
+
+    <div class="max-w-md w-full mx-auto bg-slate-800 border border-slate-700 rounded-2xl p-6 shadow-2xl">
+        
+        <!-- Header -->
+        <div class="text-center mb-6">
+            <a href="index.html" class="inline-block text-amber-400 font-extrabold text-xl tracking-tight">GREAT STAND</a>
+            <p class="text-xs text-slate-400 font-semibold tracking-wider">EDUCATIONAL CONSULT</p>
+            <h1 class="text-2xl font-bold text-white mt-4">Account Login</h1>
+            <p class="text-xs text-slate-400 mt-1">Access your portal using your registered credentials</p>
+        </div>
+
+        <!-- Alert Box for Errors/Status -->
+        <div id="statusBox" class="hidden mb-4 p-3 rounded-lg text-xs font-semibold"></div>
+
+        <!-- Login Form -->
+        <form id="loginForm" class="space-y-4">
+            <div>
+                <label class="block text-xs font-semibold text-slate-300 mb-1">Email Address</label>
+                <input type="email" id="email" required placeholder="student@greatstand.com" 
+                    class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-3 text-sm text-white focus:outline-none focus:border-amber-500 transition">
+            </div>
+
+            <div>
+                <label class="block text-xs font-semibold text-slate-300 mb-1">Password</label>
+                <input type="password" id="password" required placeholder="••••••••" 
+                    class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-3 text-sm text-white focus:outline-none focus:border-amber-500 transition">
+            </div>
+
+            <button type="submit" id="submitBtn" 
+                class="w-full bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold py-3 rounded-lg text-sm transition flex justify-center items-center">
+                <span>Sign In to Portal</span>
+            </button>
+        </form>
+
+        <!-- Links -->
+        <div class="mt-6 text-center border-t border-slate-700/60 pt-4 text-xs text-slate-400 space-y-2">
+            <p>Don't have an account yet? <span class="text-amber-400 font-semibold">Contact Admin for registration.</span></p>
+            <p><a href="index.html" class="text-slate-400 hover:text-white transition">← Back to Main Website</a></p>
+        </div>
+
+    </div>
+
+    <!-- Firebase SDKs (Modular Script) -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+        import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        // ⚠️ REPLACE THIS WITH YOUR FIREBASE CONFIG FROM CONSOLE
+        const firebaseConfig = {
+            apiKey: "YOUR_API_KEY",
+            authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+            projectId: "YOUR_PROJECT_ID",
+            storageBucket: "YOUR_PROJECT_ID.appspot.com",
+            messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+            appId: "YOUR_APP_ID"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        const form = document.getElementById('loginForm');
+        const statusBox = document.getElementById('statusBox');
+        const submitBtn = document.getElementById('submitBtn');
+
+        function showMessage(msg, isError = true) {
+            statusBox.textContent = msg;
+            statusBox.className = `mb-4 p-3 rounded-lg text-xs font-semibold ${isError ? 'bg-red-500/20 text-red-400 border border-red-500/30' : 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'}`;
+        }
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('email').value.trim();
+            const password = document.getElementById('password').value;
+
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = "Authenticating...";
+
+            try {
+                // 1. Authenticate user
+                const userCredential = await signInWithEmailAndPassword(auth, email, password);
+                const uid = userCredential.user.uid;
+
+                showMessage("Login successful! Checking role permissions...", false);
+
+                // 2. Fetch User Role from Firestore Database
+                const userDoc = await getDoc(doc(db, "users", uid));
+
+                if (userDoc.exists()) {
+                    const role = userDoc.data().role;
+                    
+                    // 3. Redirect based on role
+                    if (role === "super_admin") {
+                        window.location.href = "admin-portal.html";
+                    } else if (role === "tutor" || role === "admin") {
+                        window.location.href = "tutor-portal.html";
+                    } else {
+                        window.location.href = "student-portal.html";
+                    }
+                } else {
+                    // Fallback to Student portal if no explicit role is found
+                    window.location.href = "student-portal.html";
+                }
+
+            } catch (error) {
+                console.error(error);
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = "Sign In to Portal";
+                showMessage(error.message.replace("Firebase: ", ""));
+            }
+        });
+    </script>
+
+</body>
+</html>
