@@ -133,14 +133,14 @@
         import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
         import { getFirestore, doc, getDoc, collection, getDocs, addDoc, serverTimestamp, query, where } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-        // ⚠️ REPLACE THIS WITH YOUR FIREBASE CONFIG FROM CONSOLE
         const firebaseConfig = {
-            apiKey: "YOUR_API_KEY",
-            authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
-            projectId: "YOUR_PROJECT_ID",
-            storageBucket: "YOUR_PROJECT_ID.appspot.com",
-            messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
-            appId: "YOUR_APP_ID"
+            apiKey: "AIzaSyBHnSGUALrnN-j8inER4MNcveQwJmyhLP4",
+            authDomain: "great-stand-portal.firebaseapp.com",
+            projectId: "great-stand-portal",
+            storageBucket: "great-stand-portal.firebasestorage.app",
+            messagingSenderId: "747296287485",
+            appId: "1:747296287485:web:3289d724c48c197141ac94",
+            measurementId: "G-JE18QY2Z2K"
         };
 
         const app = initializeApp(firebaseConfig);
@@ -278,7 +278,6 @@
             document.getElementById('activeExamTitle').innerText = title;
             document.getElementById('activeExamSubject').innerText = subject;
 
-            // Start Timer
             let secondsLeft = duration * 60;
             const timerDisplay = document.getElementById('cbtTimer');
             cbtTimerInterval = setInterval(() => {
@@ -292,7 +291,6 @@
                 secondsLeft--;
             }, 1000);
 
-            // Fetch Questions
             const qContainer = document.getElementById('cbtQuestionsContainer');
             qContainer.innerHTML = `<div class="text-xs text-slate-500">Loading questions...</div>`;
             
@@ -314,7 +312,7 @@
                             ${['A', 'B', 'C', 'D'].map(opt => `
                                 <label class="flex items-center gap-3 p-2 rounded-lg border border-slate-200 hover:bg-slate-50 cursor-pointer text-xs">
                                     <input type="radio" name="question_${q.id}" value="${opt}" class="text-amber-500 focus:ring-amber-400">
-                                    <span><strong>${opt})</strong>${q.options ? q.options[opt] : q['option' + opt]}</span>
+                                    <span><strong>${opt})</strong> ${q.options ? q.options[opt] : q['option' + opt]}</span>
                                 </label>
                             `).join('')}
                         </div>
@@ -344,7 +342,6 @@
             const total = activeCbtQuestions.length;
             const percentage = total > 0 ? Math.round((score / total) * 100) : 0;
 
-            // Save Attempt to Firestore
             await addDoc(collection(db, "cbt_attempts"), {
                 studentId: currentUser.uid,
                 cbtId: activeCbtId,
