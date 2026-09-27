@@ -3,88 +3,207 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Great Stand Educational Consult | Guiding Students, Building Futures</title>
+    <title>Great Stand Educational Consult</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+
     <style>
         body { font-family: 'Plus Jakarta Sans', sans-serif; }
+        .view { display: none; }
+        .view.active { display: block; }
     </style>
 </head>
-<body class="bg-slate-950 text-slate-100 flex flex-col min-h-screen">
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col">
 
-    <!-- NAVIGATION HEADER -->
-    <header class="bg-slate-900/90 backdrop-blur-md border-b border-slate-800 sticky top-0 z-50">
-        <div class="max-w-6xl mx-auto px-4 py-4 flex justify-between items-center">
-            <a href="index.html" class="flex items-center gap-2">
-                <div class="bg-amber-500 text-slate-950 font-black p-2 rounded-lg text-sm">GS</div>
-                <div>
-                    <span class="font-extrabold text-base tracking-tight text-white block leading-none">GREAT STAND</span>
-                    <span class="text-[10px] text-amber-400 font-bold uppercase tracking-wider">Educational Consult</span>
-                </div>
-            </a>
+    <!-- GLOBAL NAVBAR -->
+    <header class="bg-slate-900 border-b border-slate-800 sticky top-0 z-50">
+        <div class="max-w-6xl mx-auto px-4 py-3 flex justify-between items-center">
+            <div class="flex items-center gap-2 cursor-pointer" onclick="switchView('homeView')">
+                <span class="font-extrabold text-lg text-amber-400">GREAT STAND</span>
+                <span class="text-[10px] text-slate-400 font-bold uppercase hidden sm:inline">Educational Consult</span>
+            </div>
             <div class="flex items-center gap-3">
-                <a href="login.html" class="bg-amber-500 hover:bg-amber-600 text-slate-950 font-extrabold text-xs px-4 py-2 rounded-lg transition shadow-lg shadow-amber-500/20">
-                    Portal Login
-                </a>
+                <!-- Language Switcher -->
+                <select id="langSwitch" onchange="changeLanguage(this.value)" class="bg-slate-950 border border-slate-800 rounded px-2 py-1 text-xs text-slate-300">
+                    <option value="en">English</option>
+                    <option value="fr">Français</option>
+                </select>
+                <div id="navAuthArea">
+                    <button onclick="switchView('loginView')" class="bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold px-3 py-1.5 rounded-lg text-xs transition">
+                        Portal Login
+                    </button>
+                </div>
             </div>
         </div>
     </header>
 
-    <!-- HERO SECTION -->
-    <section class="py-16 md:py-24 px-4 max-w-6xl mx-auto text-center">
-        <span class="bg-amber-500/10 text-amber-400 border border-amber-500/30 text-xs font-bold px-3 py-1.5 rounded-full uppercase tracking-wider inline-block mb-4">
-            Founded November 2024
-        </span>
-        <h1 class="text-3xl md:text-5xl font-black text-white leading-tight max-w-3xl mx-auto">
-            Guiding Students. <span class="text-amber-400">Building Futures.</span>
-        </h1>
-        <p class="text-slate-400 text-sm md:text-base mt-4 max-w-xl mx-auto leading-relaxed">
-            Your premier learning environment for WAEC, JAMB, and University Admission guidance. Access notes, CBT practice tests, and expert guidance.
-        </p>
-        <div class="mt-8 flex flex-wrap justify-center gap-4">
-            <a href="login.html" class="bg-amber-500 hover:bg-amber-600 text-slate-950 font-extrabold text-sm px-6 py-3 rounded-xl transition shadow-xl shadow-amber-500/20">
-                Get Started Now
-            </a>
-            <a href="#programmes" class="bg-slate-900 border border-slate-800 hover:border-slate-700 text-slate-300 font-bold text-sm px-6 py-3 rounded-xl transition">
-                Explore Programmes
-            </a>
-        </div>
-    </section>
+    <!-- MAIN APP CONTAINER -->
+    <main class="flex-grow">
 
-    <!-- PROGRAMMES SECTION -->
-    <section id="programmes" class="py-12 bg-slate-900/50 border-y border-slate-800/60 px-4">
-        <div class="max-w-6xl mx-auto">
-            <div class="text-center mb-10">
-                <h2 class="text-2xl font-bold text-white">What We Offer</h2>
-                <p class="text-slate-400 text-xs mt-1">Comprehensive academic assistance tailored to your exams</p>
-            </div>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div class="bg-slate-900 border border-slate-800 p-6 rounded-2xl">
-                    <div class="bg-amber-500/10 text-amber-400 p-3 rounded-xl w-fit mb-4">📚</div>
-                    <h3 class="font-bold text-lg text-white mb-2">Free & Paid Tutorials</h3>
-                    <p class="text-xs text-slate-400 leading-relaxed">Structured learning modules tailored for WAEC, JAMB UTME, and NECO exams.</p>
+        <!-- 1. PUBLIC HOME VIEW -->
+        <div id="homeView" class="view active">
+            <!-- Hero Section -->
+            <section class="max-w-5xl mx-auto px-4 py-16 text-center">
+                <h1 id="t_heroTitle" class="text-3xl md:text-5xl font-black text-white mb-4 leading-tight">Guiding Students. Building Futures.</h1>
+                <p id="t_heroSub" class="text-slate-400 text-sm md:text-base max-w-2xl mx-auto mb-8">Personalised academic guidance, examination strategy, and admission counseling for JAMB, WAEC, and academic excellence.</p>
+                <div class="flex justify-center gap-4">
+                    <button onclick="switchView('loginView')" class="bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold px-6 py-3 rounded-xl text-sm transition">
+                        Access Student Portal
+                    </button>
+                    <a href="https://wa.me/2349160431910" target="_blank" class="bg-slate-900 hover:bg-slate-800 border border-slate-800 text-white font-bold px-6 py-3 rounded-xl text-sm transition">
+                        Chat on WhatsApp
+                    </a>
                 </div>
-                <div class="bg-slate-900 border border-slate-800 p-6 rounded-2xl">
-                    <div class="bg-amber-500/10 text-amber-400 p-3 rounded-xl w-fit mb-4">💻</div>
-                    <h3 class="font-bold text-lg text-white mb-2">Online CBT Practice</h3>
-                    <p class="text-xs text-slate-400 leading-relaxed">Simulated Computer-Based Testing with instant scoring and detailed explanations.</p>
+            </section>
+
+            <!-- Pillars -->
+            <section class="max-w-5xl mx-auto px-4 py-12 border-t border-slate-900 grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div class="bg-slate-900/50 border border-slate-800/80 p-4 rounded-xl text-center">
+                    <h3 class="text-amber-400 font-bold text-sm mb-1">1. LEARN</h3>
+                    <p class="text-xs text-slate-400">Master core concepts thoroughly.</p>
                 </div>
-                <div class="bg-slate-900 border border-slate-800 p-6 rounded-2xl">
-                    <div class="bg-amber-500/10 text-amber-400 p-3 rounded-xl w-fit mb-4">🎓</div>
-                    <h3 class="font-bold text-lg text-white mb-2">Admission Guidance</h3>
-                    <p class="text-xs text-slate-400 leading-relaxed">Expert advice on course combinations, school requirements, and JAMB CAPS tracking.</p>
+                <div class="bg-slate-900/50 border border-slate-800/80 p-4 rounded-xl text-center">
+                    <h3 class="text-amber-400 font-bold text-sm mb-1">2. PREPARE</h3>
+                    <p class="text-xs text-slate-400">Targeted exam strategies.</p>
+                </div>
+                <div class="bg-slate-900/50 border border-slate-800/80 p-4 rounded-xl text-center">
+                    <h3 class="text-amber-400 font-bold text-sm mb-1">3. GUIDANCE</h3>
+                    <p class="text-xs text-slate-400">Accurate admission steps.</p>
+                </div>
+                <div class="bg-slate-900/50 border border-slate-800/80 p-4 rounded-xl text-center">
+                    <h3 class="text-amber-400 font-bold text-sm mb-1">4. SUCCEED</h3>
+                    <p class="text-xs text-slate-400">Outstanding results guaranteed.</p>
+                </div>
+            </section>
+        </div>
+
+        <!-- 2. LOGIN VIEW -->
+        <div id="loginView" class="view max-w-md mx-auto px-4 py-16">
+            <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl">
+                <h2 class="text-xl font-bold text-white mb-2">Portal Sign In</h2>
+                <p class="text-xs text-slate-400 mb-6">Enter your student or admin credentials.</p>
+                <div id="loginError" class="hidden mb-4 p-3 bg-red-500/20 border border-red-500/30 text-red-400 text-xs rounded-lg"></div>
+                <form onsubmit="handleLogin(event)" class="space-y-4">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-300 mb-1">Email Address</label>
+                        <input type="email" id="loginEmail" required class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-amber-500">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-300 mb-1">Password</label>
+                        <input type="password" id="loginPassword" required class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-amber-500">
+                    </div>
+                    <button type="submit" class="w-full bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold py-2.5 rounded-lg text-sm transition">
+                        Sign In
+                    </button>
+                </form>
+                <div class="mt-4 text-center">
+                    <button onclick="switchView('homeView')" class="text-xs text-slate-400 hover:text-white">&larr; Back to Home</button>
                 </div>
             </div>
         </div>
-    </section>
+
+        <!-- 3. DASHBOARD VIEW (Students & Admins) -->
+        <div id="dashboardView" class="view max-w-5xl mx-auto px-4 py-8">
+            <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 mb-6 flex justify-between items-center">
+                <div>
+                    <h2 id="dashWelcome" class="text-lg font-bold text-white">Welcome back!</h2>
+                    <p id="dashRole" class="text-xs text-amber-400 font-semibold uppercase">Role: Student</p>
+                </div>
+                <button onclick="handleLogout()" class="bg-red-500/20 hover:bg-red-500/30 text-red-400 border border-red-500/30 px-3 py-1.5 rounded-lg text-xs font-bold transition">
+                    Logout
+                </button>
+            </div>
+
+            <!-- Tab Content Area -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="bg-slate-900 border border-slate-800 p-5 rounded-xl">
+                    <h3 class="font-bold text-white text-sm mb-2">Announcements</h3>
+                    <p class="text-xs text-slate-400">No new announcements posted yet.</p>
+                </div>
+                <div class="bg-slate-900 border border-slate-800 p-5 rounded-xl">
+                    <h3 class="font-bold text-white text-sm mb-2">PDF Notes Library</h3>
+                    <p class="text-xs text-slate-400">Access study materials and summaries.</p>
+                </div>
+                <div class="bg-slate-900 border border-slate-800 p-5 rounded-xl">
+                    <h3 class="font-bold text-white text-sm mb-2">CBT Practice Tests</h3>
+                    <p class="text-xs text-slate-400">Take timed practice exams.</p>
+                </div>
+            </div>
+        </div>
+
+    </main>
 
     <!-- FOOTER -->
-    <footer class="bg-slate-950 text-slate-500 py-8 text-center text-xs border-t border-slate-800 mt-auto">
-        <div class="max-w-6xl mx-auto px-4">
-            <p class="font-bold text-slate-400">GREAT STAND EDUCATIONAL CONSULT</p>
-            <p class="mt-1">&copy; 2026 All rights reserved.</p>
-        </div>
+    <footer class="bg-slate-900 border-t border-slate-800 py-4 text-center text-xs text-slate-500 mt-auto">
+        <p>&copy; 2026 Great Stand Educational Consult. All rights reserved.</p>
     </footer>
 
+    <!-- Script Logic -->
+    <script>
+        // Multi-language dictionary
+        const translations = {
+            en: {
+                heroTitle: "Guiding Students. Building Futures.",
+                heroSub: "Personalised academic guidance, examination strategy, and admission counseling for JAMB, WAEC, and academic excellence."
+            },
+            fr: {
+                heroTitle: "Guider les étudiants. Construire des avenirs.",
+                heroSub: "Orientation académique personnalisée, stratégie d'examen et conseil en admission pour le JAMB, le WAEC et l'excellence académique."
+            }
+        };
+
+        function changeLanguage(lang) {
+            document.getElementById('t_heroTitle').innerText = translations[lang].heroTitle;
+            document.getElementById('t_heroSub').innerText = translations[lang].heroSub;
+        }
+
+        // View Switcher Function
+        function switchView(viewId) {
+            document.querySelectorAll('.view').forEach(el => el.classList.remove('active'));
+            document.getElementById(viewId).classList.add('other') || document.getElementById(viewId).classList.add('active');
+        }
+
+        // Firebase Configuration Placeholder (Replace with your keys when ready)
+        const firebaseConfig = {
+            apiKey: "YOUR_API_KEY",
+            authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+            projectId: "YOUR_PROJECT_ID",
+            storageBucket: "YOUR_PROJECT_ID.appspot.com",
+            messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+            appId: "YOUR_APP_ID"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+
+        // Login Handler
+        function handleLogin(e) {
+            e.preventDefault();
+            const email = document.getElementById('loginEmail').value;
+            const pass = document.getElementById('loginPassword').value;
+            
+            auth.signInWithEmailAndPassword(email, pass)
+                .then((userCred) => {
+                    document.getElementById('dashWelcome').innerText = `Welcome, ${userCred.user.email}`;
+                    switchView('dashboardView');
+                })
+                .catch((err) => {
+                    const errBox = document.getElementById('loginError');
+                    errBox.innerText = err.message;
+                    errBox.classList.remove('hidden');
+                });
+        }
+
+        function handleLogout() {
+            auth.signOut().then(() => {
+                switchView('homeView');
+            });
+        }
+    </script>
 </body>
 </html>
