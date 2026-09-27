@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Portal | Great Stand Educational Consult</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; }
+    </style>
+</head>
+<body class="bg-slate-100 text-slate-800 flex flex-col min-h-screen">
+
+    <!-- TOP NAVIGATION HEADER -->
+    <header class="bg-slate-900 text-white border-b-4 border-amber-500 sticky top-0 z-50">
+        <div class="max-w-6xl mx-auto px-4 py-3 flex justify-between items-center">
+            <div>
+                <a href="index.html" class="font-extrabold text-lg text-white">GREAT STAND</a>
+                <span class="block text-xs text-amber-400 font-semibold tracking-wider">STUDENT PORTAL</span>
+            </div>
+            <div class="flex items-center gap-3">
+                <span id="studentNameDisplay" class="hidden sm:inline text-xs font-semibold text-slate-300">Loading...</span>
+                <button id="logoutBtn" class="bg-red-500/20 hover:bg-red-500/30 text-red-300 border border-red-500/30 text-xs font-bold px-3 py-1.5 rounded-lg transition">
+                    Logout
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- MAIN CONTAINER -->
+    <main class="max-w-6xl mx-auto w-full px-4 py-6 flex-grow">
+        
+        <!-- Welcome Banner -->
+        <div class="bg-slate-900 text-white rounded-2xl p-6 mb-6 shadow-md border-l-4 border-amber-500">
+            <h1 id="welcomeHeading" class="text-xl md:text-2xl font-extrabold">Welcome back, Student! 👋</h1>
+            <p class="text-xs md:text-sm text-slate-300 mt-1">Access your study notes, CBT practice exams, and performance tracking below.</p>
+        </div>
+
+        <!-- MOBILE TAB NAVIGATION -->
+        <div class="flex overflow-x-auto gap-2 mb-6 pb-2 border-b border-slate-200">
+            <button onclick="switchTab('announcements')" id="tab-announcements" class="tab-btn active bg-slate-900 text-white text-xs font-bold px-4 py-2.5 rounded-lg whitespace-nowrap transition">
+                📢 Announcements
+            </button>
+            <button onclick="switchTab('notes')" id="tab-notes" class="tab-btn bg-white text-slate-700 text-xs font-bold px-4 py-2.5 rounded-lg whitespace-nowrap border border-slate-200 transition">
+                📚 Study Notes
+            </button>
+            <button onclick="switchTab('cbt')" id="tab-cbt" class="tab-btn bg-white text-slate-700 text-xs font-bold px-4 py-2.5 rounded-lg whitespace-nowrap border border-slate-200 transition">
+                💻 CBT Exams
+            </button>
+            <button onclick="switchTab('results')" id="tab-results" class="tab-btn bg-white text-slate-700 text-xs font-bold px-4 py-2.5 rounded-lg whitespace-nowrap border border-slate-200 transition">
+                📊 My Results
+            </button>
+        </div>
+
+        <!-- SECTION 1: ANNOUNCEMENTS -->
+        <section id="sec-announcements" class="tab-content">
+            <h2 class="text-lg font-bold text-slate-900 mb-4">Latest Updates & Notices</h2>
+            <div id="announcementsList" class="space-y-4">
+                <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm animate-pulse text-xs text-slate-500">
+                    Loading announcements...
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 2: STUDY NOTES -->
+        <section id="sec-notes" class="tab-content hidden">
+            <h2 class="text-lg font-bold text-slate-900 mb-4">Subject Library & PDF Notes</h2>
+            <div id="notesList" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm animate-pulse text-xs text-slate-500">
+                    Loading study notes...
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 3: CBT EXAM ENGINE -->
+        <section id="sec-cbt" class="tab-content hidden">
+            <h2 class="text-lg font-bold text-slate-900 mb-4">Available Practice Exams</h2>
+            
+            <!-- Exam Selector -->
+            <div id="cbtExamList" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm animate-pulse text-xs text-slate-500">
+                    Loading available exams...
+                </div>
+            </div>
+
+            <!-- CBT Active Interface (Hidden by default) -->
+            <div id="cbtActiveInterface" class="hidden bg-white p-6 rounded-2xl border border-slate-200 shadow-lg mt-4">
+                <div class="flex justify-between items-center border-b border-slate-200 pb-4 mb-4">
+                    <div>
+                        <h3 id="activeExamTitle" class="font-bold text-base text-slate-900">Exam Title</h3>
+                        <span id="activeExamSubject" class="text-xs bg-amber-100 text-amber-800 font-semibold px-2 py-0.5 rounded">Subject</span>
+                    </div>
+                    <div id="cbtTimer" class="bg-slate-900 text-amber-400 font-mono font-bold text-sm px-3 py-1.5 rounded-lg border border-slate-800">
+                        00:00
+                    </div>
+                </div>
+
+                <!-- Questions Container -->
+                <div id="cbtQuestionsContainer" class="space-y-6"></div>
+
+                <div class="mt-8 pt-4 border-t border-slate-200 flex justify-between items-center">
+                    <button onclick="cancelCbt()" class="text-xs font-bold text-slate-500 hover:text-slate-800">
+                        Cancel Exam
+                    </button>
+                    <button onclick="submitCbt()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs px-6 py-2.5 rounded-lg transition">
+                        Submit & Finish
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 4: MY RESULTS -->
+        <section id="sec-results" class="tab-content hidden">
+            <h2 class="text-lg font-bold text-slate-900 mb-4">CBT Performance History</h2>
+            <div id="resultsList" class="space-y-3">
+                <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm animate-pulse text-xs text-slate-500">
+                    Loading test history...
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="bg-slate-900 text-slate-400 py-4 text-center text-xs border-t border-slate-800 mt-auto">
+        <p>&copy; 2026 Great Stand Educational Consult. All rights reserved.</p>
+    </footer>
+
+    <!-- Firebase SDKs -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+        import { getFirestore, doc, getDoc, collection, getDocs, addDoc, serverTimestamp, query, where } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        // ⚠️ REPLACE THIS WITH YOUR FIREBASE CONFIG FROM CONSOLE
+        const firebaseConfig = {
+            apiKey: "YOUR_API_KEY",
+            authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+            projectId: "YOUR_PROJECT_ID",
+            storageBucket: "YOUR_PROJECT_ID.appspot.com",
+            messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+            appId: "YOUR_APP_ID"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        let currentUser = null;
+        let activeCbtQuestions = [];
+        let activeCbtId = null;
+        let cbtTimerInterval = null;
+
+        // AUTH CHECK
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                currentUser = user;
+                const userDoc = await getDoc(doc(db, "users", user.uid));
+                const userData = userDoc.exists() ? userDoc.data() : { fullName: user.email };
+                
+                document.getElementById('welcomeHeading').innerText = `Welcome back, ${userData.fullName || 'Student'}! 👋`;
+                document.getElementById('studentNameDisplay').innerText = userData.fullName || user.email;
+                
+                loadAnnouncements();
+                loadNotes();
+                loadCbtExams();
+                loadResults();
+            } else {
+                window.location.href = "login.html";
+            }
+        });
+
+        // LOGOUT
+        document.getElementById('logoutBtn').addEventListener('click', () => {
+            signOut(auth).then(() => window.location.href = "login.html");
+        });
+
+        // TAB SWITCHER FUNCTION
+        window.switchTab = function(tabName) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.className = "tab-btn bg-white text-slate-700 text-xs font-bold px-4 py-2.5 rounded-lg whitespace-nowrap border border-slate-200 transition";
+            });
+
+            document.getElementById(`sec-${tabName}`).classList.remove('hidden');
+            const activeBtn = document.getElementById(`tab-${tabName}`);
+            activeBtn.className = "tab-btn active bg-slate-900 text-white text-xs font-bold px-4 py-2.5 rounded-lg whitespace-nowrap transition";
+        };
+
+        // 1. LOAD ANNOUNCEMENTS
+        async function loadAnnouncements() {
+            const container = document.getElementById('announcementsList');
+            try {
+                const snap = await getDocs(collection(db, "announcements"));
+                if (snap.empty) {
+                    container.innerHTML = `<div class="bg-white p-4 rounded-xl border border-slate-200 text-xs text-slate-500">No announcements posted yet.</div>`;
+                    return;
+                }
+                let html = '';
+                snap.forEach(docSnap => {
+                    const data = docSnap.data();
+                    html += `
+                        <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm border-l-4 border-amber-500">
+                            <h3 class="font-bold text-sm text-slate-900 mb-1">${data.title || 'Notice'}</h3>
+                            <p class="text-xs text-slate-600 leading-relaxed">${data.content}</p>
+                        </div>`;
+                });
+                container.innerHTML = html;
+            } catch (e) {
+                container.innerHTML = `<div class="bg-white p-4 rounded-xl border border-slate-200 text-xs text-slate-500">Check back later for updates.</div>`;
+            }
+        }
+
+        // 2. LOAD NOTES
+        async function loadNotes() {
+            const container = document.getElementById('notesList');
+            try {
+                const snap = await getDocs(collection(db, "lessons"));
+                if (snap.empty) {
+                    container.innerHTML = `<div class="col-span-2 bg-white p-4 rounded-xl border border-slate-200 text-xs text-slate-500">No study notes available yet.</div>`;
+                    return;
+                }
+                let html = '';
+                snap.forEach(docSnap => {
+                    const data = docSnap.data();
+                    html += `
+                        <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between">
+                            <div>
+                                <span class="bg-slate-100 text-slate-800 text-[10px] font-bold px-2 py-0.5 rounded uppercase">${data.subject || 'General'}</span>
+                                <h3 class="font-bold text-sm text-slate-900 mt-2 mb-1">${data.title}</h3>
+                                <p class="text-xs text-slate-600 line-clamp-2">${data.description || 'Study material PDF/Lesson'}</p>
+                            </div>
+                            <a href="${data.pdfUrl || '#'}" target="_blank" class="mt-3 bg-slate-900 text-amber-400 hover:bg-slate-800 text-center text-xs font-bold py-2 rounded-lg transition">
+                                Open Study Material
+                            </a>
+                        </div>`;
+                });
+                container.innerHTML = html;
+            } catch (e) {
+                container.innerHTML = `<div class="col-span-2 bg-white p-4 rounded-xl border border-slate-200 text-xs text-slate-500">Study material library updating soon.</div>`;
+            }
+        }
+
+        // 3. LOAD CBT EXAMS
+        async function loadCbtExams() {
+            const container = document.getElementById('cbtExamList');
+            try {
+                const snap = await getDocs(collection(db, "cbts"));
+                if (snap.empty) {
+                    container.innerHTML = `<div class="col-span-2 bg-white p-4 rounded-xl border border-slate-200 text-xs text-slate-500">No scheduled CBT exams available at the moment.</div>`;
+                    return;
+                }
+                let html = '';
+                snap.forEach(docSnap => {
+                    const data = docSnap.data();
+                    html += `
+                        <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+                            <span class="bg-amber-100 text-amber-800 text-[10px] font-bold px-2 py-0.5 rounded uppercase">${data.subject || 'General'}</span>
+                            <h3 class="font-bold text-sm text-slate-900 mt-2">${data.title}</h3>
+                            <p class="text-xs text-slate-500 mt-1">Duration: ${data.durationMinutes || 15} Mins</p>
+                            <button onclick="startCbt('${docSnap.id}', '${data.title}', '${data.subject}', ${data.durationMinutes || 15})" class="w-full mt-3 bg-amber-500 hover:bg-amber-600 text-slate-950 text-xs font-bold py-2 rounded-lg transition">
+                                Start Practice Test
+                            </button>
+                        </div>`;
+                });
+                container.innerHTML = html;
+            } catch (e) {
+                container.innerHTML = `<div class="col-span-2 bg-white p-4 rounded-xl border border-slate-200 text-xs text-slate-500">No CBTs available currently.</div>`;
+            }
+        }
+
+        // START CBT EXAM
+        window.startCbt = async function(cbtId, title, subject, duration) {
+            activeCbtId = cbtId;
+            document.getElementById('cbtExamList').classList.add('hidden');
+            document.getElementById('cbtActiveInterface').classList.remove('hidden');
+            document.getElementById('activeExamTitle').innerText = title;
+            document.getElementById('activeExamSubject').innerText = subject;
+
+            // Start Timer
+            let secondsLeft = duration * 60;
+            const timerDisplay = document.getElementById('cbtTimer');
+            cbtTimerInterval = setInterval(() => {
+                const mins = Math.floor(secondsLeft / 60);
+                const secs = secondsLeft % 60;
+                timerDisplay.innerText = `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+                if (secondsLeft <= 0) {
+                    clearInterval(cbtTimerInterval);
+                    submitCbt();
+                }
+                secondsLeft--;
+            }, 1000);
+
+            // Fetch Questions
+            const qContainer = document.getElementById('cbtQuestionsContainer');
+            qContainer.innerHTML = `<div class="text-xs text-slate-500">Loading questions...</div>`;
+            
+            const snap = await getDocs(query(collection(db, "questions"), where("cbtId", "==", cbtId)));
+            activeCbtQuestions = [];
+            snap.forEach(docSnap => activeCbtQuestions.push({ id: docSnap.id, ...docSnap.data() }));
+
+            if (activeCbtQuestions.length === 0) {
+                qContainer.innerHTML = `<div class="text-xs text-slate-500">No questions found for this exam.</div>`;
+                return;
+            }
+
+            let qHtml = '';
+            activeCbtQuestions.forEach((q, idx) => {
+                qHtml += `
+                    <div class="border-b border-slate-100 pb-4">
+                        <p class="font-bold text-sm text-slate-900 mb-3">${idx + 1}. ${q.questionText}</p>
+                        <div class="space-y-2">
+                            ${['A', 'B', 'C', 'D'].map(opt => `
+                                <label class="flex items-center gap-3 p-2 rounded-lg border border-slate-200 hover:bg-slate-50 cursor-pointer text-xs">
+                                    <input type="radio" name="question_${q.id}" value="${opt}" class="text-amber-500 focus:ring-amber-400">
+                                    <span><strong>${opt})</strong>${q.options ? q.options[opt] : q['option' + opt]}</span>
+                                </label>
+                            `).join('')}
+                        </div>
+                    </div>`;
+            });
+            qContainer.innerHTML = qHtml;
+        };
+
+        // CANCEL CBT
+        window.cancelCbt = function() {
+            clearInterval(cbtTimerInterval);
+            document.getElementById('cbtActiveInterface').classList.add('hidden');
+            document.getElementById('cbtExamList').classList.remove('hidden');
+        };
+
+        // SUBMIT CBT
+        window.submitCbt = async function() {
+            clearInterval(cbtTimerInterval);
+            let score = 0;
+            activeCbtQuestions.forEach(q => {
+                const selected = document.querySelector(`input[name="question_${q.id}"]:checked`);
+                if (selected && selected.value === q.correctAnswer) {
+                    score++;
+                }
+            });
+
+            const total = activeCbtQuestions.length;
+            const percentage = total > 0 ? Math.round((score / total) * 100) : 0;
+
+            // Save Attempt to Firestore
+            await addDoc(collection(db, "cbt_attempts"), {
+                studentId: currentUser.uid,
+                cbtId: activeCbtId,
+                score: score,
+                totalPossible: total,
+                percentage: percentage,
+                submittedAt: serverTimestamp()
+            });
+
+            alert(`Exam Submitted!\nYour Score: ${score} / ${total} (${percentage}%)`);
+            cancelCbt();
+            loadResults();
+            switchTab('results');
+        };
+
+        // 4. LOAD RESULTS
+        async function loadResults() {
+            const container = document.getElementById('resultsList');
+            try {
+                const snap = await getDocs(query(collection(db, "cbt_attempts"), where("studentId", "==", currentUser.uid)));
+                if (snap.empty) {
+                    container.innerHTML = `<div class="bg-white p-4 rounded-xl border border-slate-200 text-xs text-slate-500">No test attempts logged yet.</div>`;
+                    return;
+                }
+                let html = '';
+                snap.forEach(docSnap => {
+                    const data = docSnap.data();
+                    html += `
+                        <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex justify-between items-center">
+                            <div>
+                                <h3 class="font-bold text-sm text-slate-900">Practice Test Attempt</h3>
+                                <p class="text-xs text-slate-500">Score: ${data.score} / ${data.totalPossible}</p>
+                            </div>
+                            <span class="text-sm font-extrabold px-3 py-1 rounded-lg ${data.percentage >= 50 ? 'bg-emerald-100 text-emerald-800' : 'bg-red-100 text-red-800'}">
+                                ${data.percentage}%
+                            </span>
+                        </div>`;
+                });
+                container.innerHTML = html;
+            } catch (e) {
+                container.innerHTML = `<div class="bg-white p-4 rounded-xl border border-slate-200 text-xs text-slate-500">Results list updating soon.</div>`;
+            }
+        }
+    </script>
+</body>
+</html>
